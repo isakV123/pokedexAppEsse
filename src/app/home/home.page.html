@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-title>
+      Pokedex App
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="dark">
+  <ion-searchbar placeholder="Buscar Pokémon" color="medium"></ion-searchbar>
+
+    <ion-item-sliding  *ngFor="let pokemon of listaPokemons">
+      <ion-item color="dark">
+
+        <ion-chip color="light" slot="start">
+          <ion-label [color]="pokemon.tipos[0] | lowercase">{{pokemon.numero}}</ion-label>
+        </ion-chip>
+
+        <ion-label>
+          <div>
+            <h2>{{pokemon.nome}}</h2>
+            <ion-badge [color]="tipo | lowercase" *ngFor="let tipo of pokemon.tipos">{{tipo}}</ion-badge>
+            
+          </div>
+        </ion-label>
+
+        <ion-thumbnail slot="end">
+          <img [src]="pokemon.img">
+        </ion-thumbnail>
+
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option color="danger">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+
+</ion-content>
