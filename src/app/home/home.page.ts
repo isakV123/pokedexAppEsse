@@ -96,7 +96,11 @@ export class HomePage {
 
   public listaFiltrada = [];
 
-  public listaPokemonApi: any;
+  public listaPokemonsApi: [];
+  public offsetGeral = 0;
+  public limitGeral = 10;
+  public paginaAtual = 0;
+  public totalPokemons = 0;
 
   constructor(
     public dadosService: DadosService, 
@@ -104,22 +108,44 @@ export class HomePage {
     public pokeApi: PokedexApiService
     
     ) {
-    this.buscaPokemonApi();
+    // Busca os pokemons na Api quando abre a pagina.  
+    this.buscaPokemonApi(this.offsetGeral, this.limitGeral);
   }
 
-  public buscaPokemonApi(offset = 0) { 
-    this.pokeApi.listarPokemons(offset).subscribe(dados=>{
-      this.listaPokemonApi = dados['result'];
-      console.log(this.listaPokemonApi);    
+  public buscaPokemonApi(offset, limit) { 
+    this.pokeApi.listarPokemons(offset, limit).subscribe(dados=>{
+
+      console.log(dados);
+
+      // Pega o total de pokemons
+      this.totalPokemons = dados['count'];
+
+      //Pega somente a lista com pokemons
+       let listaApi = dados['result'];   
+      
+     //percorre a lista que veio da API
+     for (let item of listaApi){
+       // Busca todos os dados do pokemon usando URL dele
+       this.pokeApi.buscarPokemonUrl(item.url).subscribe(dadosPokemon => {
+         //Adiciona dados do pokemon da final da lista
+         this.listaPokemonsApi.push(dadosPokemon);
+       });
+     } 
+     this.resetarLista();
+
+    
     });
 
   }
 
   public resetarLista() {
-    this.listaFiltrada = this.listaPokemons;
+    //this.listaFiltrada = this.listaPokemons;
+
+    this.listaFiltrada = this.listaPokemonsApi;
+
   }
 
-  public abrirDadosPokemon(pokemon: any) {
+  public abrirdadosPokemon(pokemon: any) {
 
     //Salva os dados no BD virtual
     this.dadosService.setDados('dadosPokemon', pokemon);
