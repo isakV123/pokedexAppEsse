@@ -96,24 +96,24 @@ export class HomePage {
 
   public listaFiltrada = [];
 
-  public listaPokemonsApi: [];
+  public listaPokemonsApi = [];
   public offsetGeral = 0;
   public limitGeral = 10;
   public paginaAtual = 0;
   public totalPokemons = 0;
 
   constructor(
-    public dadosService: DadosService, 
-    public router: Router, 
+    public dadosService: DadosService,
+    public router: Router,
     public pokeApi: PokedexApiService
-    
-    ) {
+
+  ) {
     // Busca os pokemons na Api quando abre a pagina.  
     this.buscaPokemonApi(this.offsetGeral, this.limitGeral);
   }
 
-  public buscaPokemonApi(offset, limit) { 
-    this.pokeApi.listarPokemons(offset, limit).subscribe(dados=>{
+  public buscaPokemonApi(offset, limit) {
+    this.pokeApi.listarPokemons(offset, limit).subscribe(dados => {
 
       console.log(dados);
 
@@ -121,25 +121,38 @@ export class HomePage {
       this.totalPokemons = dados['count'];
 
       //Pega somente a lista com pokemons
-       let listaApi = dados['result'];   
-      
-     //percorre a lista que veio da API
-     for (let item of listaApi){
-       // Busca todos os dados do pokemon usando URL dele
-       this.pokeApi.buscarPokemonUrl(item.url).subscribe(dadosPokemon => {
-         //Adiciona dados do pokemon da final da lista
-         this.listaPokemonsApi.push(dadosPokemon);
-       });
-     } 
-     this.resetarLista();
+      let listaApi = dados['results'];
 
-    
+      //percorre a lista que veio da API
+      for (let item of listaApi) {
+
+        // Busca todos os dados do pokemon usando URL dele
+        this.pokeApi.buscarPokemonUrl(item.url).subscribe(dadosPokemon => {
+          this.listaPokemonsApi.push(dadosPokemon);
+
+          this.resetarLista();
+        })
+      }
+     
+
+
     });
 
   }
 
   public resetarLista() {
     //this.listaFiltrada = this.listaPokemons;
+
+    //ordena a lista de pokemons
+    this.listaPokemonsApi.sort(function (a, b) {
+      if (a.id > b.id) {
+        return 1;
+      }
+      if (a.id < b.id) {
+        return -1;
+      }
+      return 0;
+    });
 
     this.listaFiltrada = this.listaPokemonsApi;
 
